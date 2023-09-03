@@ -1,71 +1,198 @@
-public class IntegerListImp implements IntegerList{
+import exceptions.ElementNotFounfException;
+import exceptions.InvalidIndexException;
+import exceptions.NullItemException;
+import exceptions.StorageIsFullException;
+
+import java.util.Arrays;
+
+public class IntegerListImp implements IntegerList {
+    private int size;
+    private final Integer[] storage;
+    public IntegerListImp() {
+        storage = new Integer[4];
+    }
+
+    public IntegerListImp(int setSize) {
+        storage = new Integer[setSize];
+    }
+    private void validateItem(Integer item) {
+        if (item == null) {
+            throw new NullItemException();
+        }
+    }
+    private void validateIndex(int index) {
+        if (index < 0 || index > size) {
+            throw new InvalidIndexException();
+        }
+    }
+    private void validateSize() {
+        if (size == storage.length) {
+            throw new StorageIsFullException();
+        }
+    }
+
     @Override
     public Integer add(Integer item) {
-        return null;
+        validateSize();
+        validateItem(item);
+        storage[size++] = item;
+        return item;
     }
 
     @Override
     public Integer add(int index, Integer item) {
-        return null;
+        validateSize();//StorageIsFullException
+        validateItem(item);
+        validateIndex(index);
+        if (index == size) {
+            storage[size++] = item;
+            return item;
+        }
+        System.arraycopy(
+                storage,
+                index,
+                storage,
+                index + 1,
+                size - index);
+        storage[index] = item;
+        size++;
+        return item;
     }
 
     @Override
     public Integer set(int index, Integer item) {
-        return null;
+        validateIndex(index);
+        validateItem(item);
+        storage[index] = item;
+        return item;
     }
 
     @Override
     public Integer remove(Integer item) {
-        return null;
+        validateItem(item);
+        int index = indexOf(item);
+        if (index == -1) {
+            throw new ElementNotFounfException();
+        }
+        if (index != size) {
+            System.arraycopy(storage,
+                    index + 1,
+                    storage,
+                    index,
+                    storage.length-1);
+        }
+        size--;
+        return item;
     }
 
     @Override
     public Integer remove(int index) {
-        return null;
+        validateIndex(index);
+        Integer item = storage[index];
+        if (index != size) {
+            System.arraycopy(
+                    storage,
+                    index + 1,
+                    storage,
+                    index,
+                    storage.length-1);//size - index
+
+        }
+        size--;
+        return item;
     }
 
     @Override
     public boolean contains(Integer item) {
-        return false;
+        Integer[] storeCopy=toArray();
+        sort(storeCopy);
+        return binarySearch(storeCopy,item);
     }
 
     @Override
     public int indexOf(Integer item) {
-        return 0;
+        for (int i = 0; i < size; i++) {
+            if (storage[i].equals(item)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
     public int lastIndexOf(Integer item) {
-        return 0;
+        for (int i = size - 1; i >= 0; i--) {
+            if (storage[i].equals(item)) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     @Override
     public Integer get(int index) {
-        return null;
+        validateIndex(index);
+        return storage[index];
     }
 
     @Override
     public boolean equals(IntegerList otherList) {
-        return false;
+        return Arrays.equals(
+                this.toArray(),
+                otherList.toArray());
     }
 
     @Override
     public int size() {
-        return 0;
+        return size;
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return size == 0;
     }
 
     @Override
     public void clear() {
-
+        size = 0;
     }
 
     @Override
     public Integer[] toArray() {
-        return new Integer[0];
+        return Arrays.copyOf(
+                storage,
+                size);//копируем массив без учета пустых ячеек
+    }
+
+    public static boolean binarySearch(Integer[] arr, Integer item) {
+        int min = 0;
+        int max = arr.length - 1;
+
+        while (min <= max) {
+            int mid = (min + max) / 2;
+
+            if (item == arr[mid]) {
+                return true;
+            }
+
+            if (item < arr[mid]) {
+                max = mid - 1;
+            } else {
+                min = mid + 1;
+            }
+        }
+        return false;
+    }
+    public static void sort(Integer[] arr) {
+//        System.out.println("Сортировка вставкой");
+        for (int i = 1; i < arr.length; i++) {
+            int temp = arr[i];
+            int j = i;
+            while (j > 0 && arr[j - 1] >= temp) {
+                arr[j] = arr[j - 1];
+                j--;
+            }
+            arr[j] = temp;
+        }
     }
 }
