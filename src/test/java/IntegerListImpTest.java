@@ -104,7 +104,7 @@ class IntegerListImpTest {
 
     @Test
     void testToArray() {
-        IntegerListImp integerListImpList = new IntegerListImp(1);
+        IntegerListImp integerListImpList = new IntegerListImp(4);
         integerListImpList.add(ITEM1);
 
         Integer[] array = integerListImpList.toArray();
